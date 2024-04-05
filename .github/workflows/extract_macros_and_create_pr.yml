@@ -1,0 +1,60 @@
+name: extract_macros_and_create_pr
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+jobs:
+  extract_macros_and_create_pr:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: 'current_branch_co'
+
+      - name: Extract macros
+        run: |
+          pip install -U oletools && python current_branch_co/_tools/extract_office_macros.py
+
+      - name: Upload OfficeFiles with extracted macros
+        uses: actions/upload-artifact@v4
+        with:
+          name: Extracted_Macros
+          path: current_branch_co/OfficeFiles/**
+
+      - uses: actions/checkout@v4
+        with:
+          ref: 'reviewed'
+          path: 'reviewed_branch_co'
+
+      - name: Push to 'reviewed' branch and create or update PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_BRANCH: "reviewed"
+          UPDATE_COMMIT_MESSAGE: "Update from branch `${{ github.ref_name }}`, commit ${{ github.sha }} with extracted macro code"
+          UPDATE_PR_TITLE: "Review macros (before signing)"
+        run: |
+          git config --global user.email "commit@bot"
+          git config --global user.name "Commit Bot"
+
+          echo "Copying OfficeFiles from 'current_branch_co' ..."
+          mkdir -p reviewed_branch_co/OfficeFiles/ && cp -r -v current_branch_co/OfficeFiles/* reviewed_branch_co/OfficeFiles/
+
+          cd reviewed_branch_co
+
+          git checkout -b "${TARGET_BRANCH}_pr"
+          git add -A
+          git commit -m "$UPDATE_COMMIT_MESSAGE" --allow-empty
+
+          git push --set-upstream origin "${TARGET_BRANCH}_pr" --force
+
+          echo "Create or update PR ..."
+          gh pr edit "${TARGET_BRANCH}_pr" -b "$UPDATE_COMMIT_MESSAGE" && gh pr reopen "${TARGET_BRANCH}_pr" || \
+            gh pr create --base $TARGET_BRANCH --head "${TARGET_BRANCH}_pr" -t "$UPDATE_PR_TITLE" -b "$UPDATE_COMMIT_MESSAGE"
