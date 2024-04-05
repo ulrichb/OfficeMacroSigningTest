@@ -29,3 +29,20 @@ jobs:
           path: |
             **/*.xlsm
             **/*_Macros/*
+
+      - name: Push to signed PR
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_BRANCH: "signed"
+          UPDATE_COMMIT_MESSAGE: "Update from from ${{ github.sha }} with extracted macro code"
+        run: |
+          git config --global user.email "commit@bot"
+          git config --global user.name "Commit Bot"
+          git branch -f "${TARGET_BRANCH}_pr"
+          git checkout "${TARGET_BRANCH}_pr"
+          rm -rf _tools/
+          git add -A
+          git commit -a -m "$UPDATE_COMMIT_MESSAGE" --allow-empty
+          git push --set-upstream origin "${TARGET_BRANCH}_pr" --force
+          gh pr edit "${TARGET_BRANCH}_pr" -b "$UPDATE_COMMIT_MESSAGE" || gh pr create --base $TARGET_BRANCH -t "Sign Macros" -b "$UPDATE_COMMIT_MESSAGE"
