@@ -45,4 +45,4 @@ jobs:
           git add -A
           git commit -a -m "$UPDATE_COMMIT_MESSAGE" --allow-empty
           git push --set-upstream origin "${TARGET_BRANCH}_pr" --force
-          gh pr create --base $TARGET_BRANCH -t "Sign Macros" -b "$UPDATE_COMMIT_MESSAGE"
+          gh pr edit "${TARGET_BRANCH}_pr" -b "$UPDATE_COMMIT_MESSAGE" || gh pr create --base $TARGET_BRANCH -t "Sign Macros" -b "$UPDATE_COMMIT_MESSAGE"
