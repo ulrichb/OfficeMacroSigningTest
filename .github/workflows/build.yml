@@ -1,0 +1,31 @@
+name: extract_macros
+
+on:
+  - workflow_dispatch
+  - push
+
+permissions:
+  contents: write
+  pull-requests: write
+  repository-projects: write
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Extract macros
+        run: |
+          pip install -U oletools && python _tools/extract_office_macros.py
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Extracted_Macros
+          path: |
+            **/*.xlsm
+            **/*_Macros/*
