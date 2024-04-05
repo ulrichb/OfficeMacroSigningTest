@@ -34,8 +34,8 @@ jobs:
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_BRANCH: "signed"
-          UPDATE_COMMIT_MESSAGE: "Update from from ${{ github.sha }} with extracted macro code"
+          TARGET_BRANCH: "reviewed"
+          UPDATE_COMMIT_MESSAGE: "Update from ${{ github.sha }} with extracted macro code"
         run: |
           git config --global user.email "commit@bot"
           git config --global user.name "Commit Bot"
