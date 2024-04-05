@@ -8,5 +8,6 @@ Attribute VB_TemplateDerived = False
 Attribute VB_Customizable = True
 Sub HelloInWorkbook()
     MsgBox "Hello from HelloInWorkbook"
+    'Changed
 End Sub
 
