@@ -1,0 +1,41 @@
+name: sign
+
+on:
+  push:
+    branches: ["reviewed"]
+  workflow_dispatch:
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Zip OfficeFiles
+        run: cd OfficeFiles && zip -r ../OfficeFiles.zip *
+
+      - name: upload-unsigned-artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: OfficeFiles
+          path: OfficeFiles.zip
+
+      - name: Sign
+        uses: SignPath/github-actions/actions/submit-signing-request@v0.1
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: 'caa5e4fa-f3ca-431b-8888-67952847b3e6'
+          project-slug: 'OfficeMacrosFromGitDemo'
+          signing-policy-slug: 'release-signing'
+          artifact-configuration-slug: 'initial'
+          artifact-name: 'OfficeFiles'
+          signed-artifact-destination-path: 'OfficeFiles.signed.zip'
+
+      - name: upload-unsigned-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OfficeFiles.signed
+          path: OfficeFiles.signed.zip
