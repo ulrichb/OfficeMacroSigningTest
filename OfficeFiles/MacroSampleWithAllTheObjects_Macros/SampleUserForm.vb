@@ -3,5 +3,5 @@ Private Sub CommandButton_Click()
 End Sub
 
 Private Sub CommandButton2_Click()
-    MsgBox "Hello from SampleUserForm.CommandButton2_Click()"
+    MsgBox "Hello from SampleUserForm.CommandButton2_Click()  CHANGE"
 End Sub
