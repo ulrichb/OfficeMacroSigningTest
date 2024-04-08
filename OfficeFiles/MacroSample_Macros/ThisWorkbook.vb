@@ -7,6 +7,6 @@ Attribute VB_Exposed = True
 Attribute VB_TemplateDerived = False
 Attribute VB_Customizable = True
 Sub HelloInWorkbook()
-    MsgBox "Hello from HelloInWorkbook"
+    MsgBox "Hello from HelloInWorkbook EDIT"
 End Sub
 
